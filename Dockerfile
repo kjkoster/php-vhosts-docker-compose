@@ -5,5 +5,7 @@ COPY ./apache/config/first.example.com.conf /etc/apache2/sites-available/
 COPY ./sites/second.example.com/ /var/www/second.example.com/
 COPY ./apache/config/second.example.com.conf /etc/apache2/sites-available/
 
-RUN a2ensite first.example.com.conf second.example.com.conf
+COPY ./ssl.crt /etc/apache2/ssl/ssl.crt
+COPY ./ssl.key /etc/apache2/ssl/ssl.key
 
+RUN a2enmod ssl rewrite && a2ensite first.example.com.conf second.example.com.conf

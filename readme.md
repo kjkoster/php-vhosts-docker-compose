@@ -12,6 +12,9 @@ The example packs the complete set of PHP-enabled websites into the image for
 production use. The same image can be used on a development or test server,
 ensuring that what is tested is also what is going live.
 
+All services come with SSL and have their HTTP requests redirected to be HTTPS
+requests.
+
 For local development, the websites are mounted directly onto the file system in
 the container. This means that file changes are picked up immediately, without
 builds or restarts.
@@ -20,6 +23,11 @@ The Apache log directory is mounted from the host, so that these are available
 for troubleshooting.
 
 ## Running on Production
+
+For running in production, you will need to collect your SSL certificate for
+the website. Place them into the root of this project as`ssl.*`. If they have a
+different name, rename them or change the relevant `COPY` directives in
+`Dockerfile`.
 
 This image was designed for production use, so we can start it on the production
 server using:
@@ -36,7 +44,7 @@ This assumes that the DNS is configured to send traffic for the various virtual
 hosts to the IP address of the production server.
 
 Once the image was built and the container is running, you can open your web
-browser and open the URL http://first.example.com to access the application.
+browser and open the URL https://first.example.com to access the application.
 
 ## Running Locally, for Development
 
@@ -72,6 +80,13 @@ PING first.example.com (127.0.0.1): 56 data bytes
 ^C
 ```
 
+Next step is to generate your SSL certificates. Do not commit your certificates
+to git. I am serious.
+
+```sh
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ssl.key -out ssl.crt -subj "/C=US/ST=YourState/L=YourCity/O=YourOrganization/CN=example.com"
+```
+
 With that in place, you can start the local server using the `--build` flag to
 pick up any structural changes:
 
@@ -89,8 +104,9 @@ docker compose config
 ```
 
 Once the image was built and the container is running, you can open your web
-browser and open the URL http://first.example.com to access the application on
-the local development server.
+browser and open the URL https://first.example.com to access the application on
+the local development server. You will be greeted by an SSL error, but that is
+due to the self-signed certificates. You can accept the error and proceed.
 
 ## Reference
 

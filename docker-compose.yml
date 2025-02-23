@@ -2,7 +2,8 @@ services:
   php-apache:
     build: .
     ports:
-      - "80:80"
+      - 80:80
+      - 443:443
     volumes:
       # This makes the server log files available outside of the running
       # container, which can be useful for debugging.
