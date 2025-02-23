@@ -1,0 +1,10 @@
+services:
+  php-apache:
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      # This makes the server log files available outside of the running
+      # container, which can be useful for debugging.
+      - ./apache/logs:/var/log/apache2
+    restart: unless-stopped
