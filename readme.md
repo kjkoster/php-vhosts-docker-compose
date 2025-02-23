@@ -3,21 +3,34 @@
 This is yet another example project that shows how to set up PHP in a Docker
 container. It has a couple of features that many others may not have.
 
-The project packs the complete set of PHP-enabled websites into the image for
+For context, let's say that you have a bunch of websites that use PHP. For
+simplicity I will assume that these websites are all under the `./sites/`
+directory. You can add or change paths once you are familiar with the structure
+of this project.
+
+The example packs the complete set of PHP-enabled websites into the image for
 production use. The same image can be used on a development or test server,
 ensuring that what is tested is also what is going live.
 
-The Apache log directory is mounted from the host, so that these are avvailable
+For local development, the websites are mounted directly onto the file system in
+the container. This means that file changes are picked up immediately, without
+builds or restarts.
+
+The Apache log directory is mounted from the host, so that these are available
 for troubleshooting.
 
 ## Running on Production
 
-This image was designed for production use, so we can simply start it on the
-production server using:
+This image was designed for production use, so we can start it on the production
+server using:
 
 ```sh
-docker-compose up
+docker compose -f docker-compose.yml up
 ```
+
+Note how we explicity tell Docker Compose to use the base compose file. This
+means that any overrides from `docker-compose.override.yml` are ignored on
+production.
 
 This assumes that the DNS is configured to send traffic for the various virtual
 hosts to the IP address of the production server.
@@ -27,72 +40,57 @@ browser and open the URL http://first.example.com to access the application.
 
 ## Running Locally, for Development
 
-For local development, first make sure that the host names of the virtual
-servers resolve to `localhost`. For that, edit `/etc/hosts` with your favourite
-editor, adding lines as follows:
+For local development it is important to have a quicker cycle than to rebuild
+images and restart containers all the time. This section explains how to set up
+for local development and how to edit files locally without having to rebuild
+and restart the container.
+
+There is some risk in using a different domain during development. Your code may
+have URLs with the production domain name hardcoded. When that is the case, you
+can end up mixing connections to the local server with connections to the
+production server. We will work around this problem by overriding the production
+server's DNS settings in out local `/etc/hosts` file.
+
+Edit `/etc/hosts` with your favourite editor, adding lines as follows:
 
 ```
-127.0.0.1 first.local
-127.0.0.1 second.local
+127.0.0.1 first.example.com
+127.0.0.1 second.example.com
 ```
+
+There is no support for wildcards in `/etc/hosts`, so you will have to be
+careful to list each and every one of your subdomains separately.
 
 You can verify that this works using `ping`. Check that the IP address for the
 virtual hosts resolve to `127.0.0.1`.
 
 ```sh
-$ ping first.local
-PING first.local (127.0.0.1): 56 data bytes
+$ ping first.example.com
+PING first.example.com (127.0.0.1): 56 data bytes
 64 bytes from 127.0.0.1: icmp_seq=0 ttl=64 time=0.096 ms
 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.269 ms
 ^C
 ```
 
-With that in place, you can start the local server using:
+With that in place, you can start the local server using the `--build` flag to
+pick up any structural changes:
 
 ```sh
-docker-compose up --build
+docker compose up --build
 ```
 
-The `--build` flag tells Docker Compose to rebuild the image and recreate the
-container, so that changes will be picked up.
+By omitting the `-f` flag that we needed on the production server, Docker
+Compose loads both the base compose file, as well as
+`docker-compose-override.yml`, in that order. You can view the resulting
+configuration using:
+
+```sh
+docker compose config
+```
 
 Once the image was built and the container is running, you can open your web
-browser and open the URL http://first.local to access the application.
-
-There is some risk involved in using a different domain during development. Your
-code may have URLs with the production domain name hardcoded. In that case, you
-can end up in the situation where some traffic escapes and calls out to the
-production server. To trap such cases, set your development machine to route
-traffic to a non-existent IP address. Here we use `127.0.0.2`. That is not an
-officially recognised way of doing that, but it works in most cases. The
-hardcoded URLs now show up as errors in your web browser development tools.
-
-```
-127.0.0.1 first.local
-127.0.0.1 second.local
-
-127.0.0.2 first.example.com
-127.0.0.2 second.example.com
-```
-
-Note the use of `.2` instead of the more typical `.1` at the end.
-
-There is no support for wildcards in `/etc/hosts`, so you will have to be
-careful to list each and every one of your subdomains separately. Once done,
-check that traffic to your main domain is now blocked on your development
-machine:
-
-```
-$ curl -v --connect-timeout 1 first.example.com
-* Host first.example.com:80 was resolved.
-* IPv6: (none)
-* IPv4: 127.0.0.2
-*   Trying 127.0.0.2:80...
-* ipv4 connect timeout after 998ms, move on!
-* Failed to connect to first.example.com port 80 after 1007 ms: Timeout was reached
-* Closing connection
-curl: (28) Failed to connect to first.example.com port 80 after 1007 ms: Timeout was reached
-```
+browser and open the URL http://first.example.com to access the application on
+the local development server.
 
 ## Reference
 
@@ -101,11 +99,12 @@ found at inside the container. Tutorials use a variety of Docker images. Apache
 and PHP may be shown using slightly different paths each time. Here is what the
 official PHP image uses:
 
-- PHP:
+* PHP:
     - configuration: /usr/local/etc/php/conf.d/
-- Apache:
+* Apache:
     - configuration: /etc/apache2/
     - log files: /var/log/apache2/
+    - www root: /var/www/
 
 - [Official PHP Docker Image](https://hub.docker.com/_/php) I chose to use the
   official PHP image instead of rolling my own or using the official Apache

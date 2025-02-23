@@ -1,0 +1,5 @@
+services:
+  php-apache:
+    volumes:
+      - ./sites/first.example.com:/var/www/first.example.com:ro
+      - ./sites/second.example.com:/var/www/second.example.com:ro
