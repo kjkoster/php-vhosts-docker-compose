@@ -29,16 +29,16 @@ servers resolve to `localhost`. For that, edit `/etc/hosts` with your favourite
 editor, adding lines as follows:
 
 ```
-127.0.0.1 first.example.com
-127.0.0.1 second.example.com
+127.0.0.1 first.local
+127.0.0.1 second.local
 ```
 
 You can verify that this works using `ping`. Check that the IP address for the
 virtual hosts resolve to `127.0.0.1`.
 
 ```sh
-$ ping first.example.com
-PING first.example.com (127.0.0.1): 56 data bytes
+$ ping first.local
+PING first.local (127.0.0.1): 56 data bytes
 64 bytes from 127.0.0.1: icmp_seq=0 ttl=64 time=0.096 ms
 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.269 ms
 ^C
