@@ -1,7 +1,7 @@
 <h1>Second Example</h1>
 <?php
-echo "PHP Version: " . phpversion() . "\n";
-echo date(DATE_ISO8601, strtotime(date("Y-m-d H:i:s")));
-
+echo "PHP Version: " . phpversion() . "<br>\n";
+echo date(DATE_ISO8601, strtotime(date("Y-m-d H:i:s"))) . "<br>\n";
+echo "Full Server Name: " . $_SERVER["SERVER_NAME"] . "\n";
 
 ?>
