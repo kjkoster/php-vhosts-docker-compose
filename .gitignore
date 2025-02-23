@@ -1,3 +1,4 @@
 apache/logs
 ssl.crt
 ssl.key
+.env

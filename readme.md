@@ -13,7 +13,8 @@ production use. The same image can be used on a development or test server,
 ensuring that what is tested is also what is going live.
 
 All services come with SSL and have their HTTP requests redirected to be HTTPS
-requests.
+requests. There is a sample of how you might pass in the database server
+credentials.
 
 For local development, the websites are mounted directly onto the file system in
 the container. This means that file changes are picked up immediately, without
@@ -28,6 +29,14 @@ For running in production, you will need to collect your SSL certificate for
 the website. Place them into the root of this project as`ssl.*`. If they have a
 different name, rename them or change the relevant `COPY` directives in
 `Dockerfile`.
+
+Create a `.env` file that defines all the variables you need:
+
+```
+MYSQL_HOST=<your MySQL server name or address>
+MYSQL_USER=<your MySQL user name>
+MYSQL_PASS=<your MySQL users password>
+```
 
 This image was designed for production use, so we can start it on the production
 server using:
@@ -87,6 +96,14 @@ to git. I am serious.
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ssl.key -out ssl.crt -subj "/C=US/ST=YourState/L=YourCity/O=YourOrganization/CN=example.com"
 ```
 
+Create a `.env` file that defines all the variables you need:
+
+```
+MYSQL_HOST=<your MySQL server name or address>
+MYSQL_USER=<your MySQL user name>
+MYSQL_PASS=<your MySQL users password>
+```
+
 With that in place, you can start the local server using the `--build` flag to
 pick up any structural changes:
 
@@ -133,3 +150,6 @@ official PHP image uses:
   by [Samuel Goldstein](https://www.fogbound.net/who-am-i/) Useful because it
   explains both virtual hosts and SSL. You will see that I have adapted from
   his example quite a bit.
+- [Docker Compose Environment Variables: How to Set and Use Them Effectively](https://cyberpanel.net/blog/docker-compose-environment-variables)
+  by [Marium Fahim](mailto:marium.fahim@cyberperons.com). Good explanation of
+  using environment variables.

@@ -4,6 +4,11 @@ services:
     ports:
       - 80:80
       - 443:443
+    environment:
+      # define these in a file named `.env`
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASS: ${MYSQL_PASS}
     volumes:
       # This makes the server log files available outside of the running
       # container, which can be useful for debugging.
