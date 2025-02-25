@@ -21,7 +21,10 @@ the container. This means that file changes are picked up immediately, without
 builds or restarts.
 
 The Apache log directory is mounted from the host, so that these are available
-for troubleshooting.
+for troubleshooting. The access log files include the response times for all
+HTTP requests (note the `%D` in the
+[log format definition](https://httpd.apache.org/docs/current/mod/mod_log_config.html#formats),
+the times are logged in microseconds).
 
 ## Running on Production
 
